@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adviance — AI operating system for financial advisors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #2f486d;
+    --navy-dark: #223148;
+    --cream: #f3eae0;
+    --beige: #d2c7b8;
+    --beige-soft: #e6ddd1;
+    --white: #fdfbf8;
+    --ai-blue: #2f486d;
+    --ai-blue-bg: #eef1f6;
+    --ai-blue-border: #aebfd8;
+    --red: #b3402e;
+    --red-bg: #f7e7e3;
+    --amber: #a9701a;
+    --amber-bg: #f6ecd9;
+    --green: #4a7344;
+    --green-bg: #e7efe0;
+    --text-soft: #6b6356;
+    --text-faint: #968c7d;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --shadow: 0 1px 2px rgba(34,49,72,0.04), 0 4px 16px rgba(34,49,72,0.04);
+    --shadow-lift: 0 2px 4px rgba(34,49,72,0.06), 0 12px 32px rgba(34,49,72,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  .icn { display: inline-flex; align-items: center; justify-content: center; }
+  .icn svg { width: 1em; height: 1em; display: block; }
+  .nav-link .icn { font-size: 17px; }
+  .card-title .icn { font-size: 18px; }
+  .stat-icon .icn { font-size: 21px; }
+  .briefing-sun .icn { font-size: 23px; }
+  .date-pill .icn { font-size: 16px; }
+  .metric-top .icn { font-size: 17px; }
+  .search-box .icn { font-size: 18px; }
+  .stat-link .icn, .ai-badge .icn { font-size: 1em; }
+  .btn .icn { font-size: 15px; }
+  .nav-bell.icn { font-size: 19px; }
+  .temp .icn { font-size: 12px; }
+  .section-label .icn { font-size: 16px; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--cream);
+    color: var(--navy-dark);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+
+  ::selection { background: var(--navy); color: var(--cream); }
+
+  /* ---------- NAV ---------- */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(243,234,224,0.92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--beige);
+  }
+  body { padding-top: 69px; }
+  .nav-inner {
+    max-width: 1180px; margin: 0 auto;
+    padding: 0 32px; height: 68px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 11px; }
+  .brand-mark {
+    width: 32px; height: 32px; border-radius: 9px;
+    background: var(--navy); color: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700;
+  }
+  .brand-name { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 600; color: var(--navy-dark); letter-spacing: 0.2px; }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-link {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 14px; font-weight: 500; color: var(--text-soft);
+    padding: 8px 16px; border-radius: 9px; cursor: pointer;
+    border: none; background: none; font-family: inherit;
+    transition: all 0.18s ease;
+  }
+  .nav-link i { font-size: 17px; }
+  .nav-link:hover { color: var(--navy-dark); background: rgba(210,199,184,0.4); }
+  .nav-link.active { color: var(--cream); background: var(--navy); }
+  .nav-user {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--navy-dark); color: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .nav-right { display: flex; align-items: center; gap: 18px; }
+  .nav-bell { font-size: 19px; color: var(--text-soft); cursor: pointer; position: relative; }
+  .nav-bell::after { content: ''; position: absolute; top: 1px; right: 1px; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+
+  /* ---------- LAYOUT ---------- */
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 36px 32px 80px; }
+  .screen { display: none; animation: fade 0.4s ease; }
+  .screen.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .page-head { margin-bottom: 28px; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-faint); margin-bottom: 8px; }
+  .page-title { font-size: 32px; font-weight: 600; color: var(--navy-dark); letter-spacing: -0.3px; }
+  .page-sub { font-size: 15px; color: var(--text-soft); margin-top: 6px; }
+
+  /* ---------- DASH HEAD ---------- */
+  .dash-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 26px; gap: 20px; }
+  .dash-greet { font-size: 32px; font-weight: 600; color: var(--navy-dark); letter-spacing: -0.4px; }
+  .dash-sub { font-size: 15px; color: var(--text-soft); margin-top: 5px; }
+  .date-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 500; color: var(--text-soft);
+    background: var(--white); border: 1px solid var(--beige);
+    padding: 9px 16px; border-radius: 99px; white-space: nowrap; margin-top: 4px;
+  }
+  .date-pill i { font-size: 16px; color: var(--navy); }
+
+  /* ---------- CARDS ---------- */
+  .card {
+    background: var(--white); border: 1px solid var(--beige);
+    border-radius: var(--radius); padding: 22px;
+    box-shadow: var(--shadow);
+  }
+  .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .card-title { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 600; color: var(--navy-dark); }
+  .card-title i { font-size: 18px; }
+
+  /* ---------- AI components ---------- */
+  .ai-card {
+    background: var(--ai-blue-bg);
+    border: 1px solid var(--ai-blue-border);
+    border-radius: var(--radius); padding: 22px 24px;
+    position: relative;
+  }
+  .ai-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+    color: var(--ai-blue); background: var(--white);
+    border: 1px solid var(--ai-blue-border);
+    padding: 3px 9px; border-radius: 99px;
+  }
+  .ai-badge i { font-size: 12px; }
+
+  /* ---------- BRIEFING ---------- */
+  .briefing { margin-bottom: 22px; display: flex; gap: 20px; align-items: flex-start; }
+  .briefing-sun {
+    width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+    background: var(--white); border: 1px solid var(--ai-blue-border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--amber); font-size: 23px;
+  }
+  .briefing-body { flex: 1; }
+  .briefing-top { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .briefing-greet { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 600; color: var(--navy-dark); }
+  .briefing-text { font-size: 14.5px; color: #45433d; line-height: 1.65; max-width: 760px; }
+  .briefing-text strong { color: var(--navy-dark); font-weight: 600; }
+
+  /* ---------- GRID ---------- */
+  .grid-3 { display: grid; grid-template-columns: 1.45fr 1fr 1fr; gap: 18px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+
+  /* ---------- CLIENT ROWS ---------- */
+  .client-row { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--beige-soft); }
+  .client-row:last-child { border-bottom: none; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .dot.high { background: var(--red); }
+  .dot.med { background: var(--amber); }
+  .dot.low { background: var(--green); }
+  .client-info { flex: 1; min-width: 0; }
+  .client-name { font-size: 14px; font-weight: 600; color: var(--navy-dark); }
+  .client-meta { font-size: 12.5px; color: var(--text-soft); margin-top: 2px; }
+  .client-score { text-align: right; flex-shrink: 0; }
+  .score-num { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; color: var(--navy-dark); line-height: 1; }
+  .score-label { font-size: 10px; color: var(--text-faint); }
+
+  .badge { font-size: 10px; font-weight: 600; letter-spacing: 0.4px; padding: 3px 9px; border-radius: 99px; flex-shrink: 0; }
+  .badge.high { background: var(--red-bg); color: var(--red); }
+  .badge.med { background: var(--amber-bg); color: var(--amber); }
+  .badge.low { background: var(--green-bg); color: var(--green); }
+
+  /* ---------- SCHEDULE / FOLLOWUP ---------- */
+  .list-item { padding: 12px 0; border-bottom: 1px solid var(--beige-soft); }
+  .list-item:last-child { border-bottom: none; }
+  .list-time { font-size: 11.5px; color: var(--text-faint); font-weight: 500; }
+  .list-main { font-size: 14px; color: var(--navy-dark); margin-top: 3px; }
+  .list-flag { font-size: 11.5px; margin-top: 3px; font-weight: 500; }
+  .flag-red { color: var(--red); }
+  .flag-faint { color: var(--text-faint); }
+
+  /* ---------- BUTTONS ---------- */
+  .btn {
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    padding: 9px 18px; border-radius: 9px; cursor: pointer;
+    border: 1px solid var(--navy); background: var(--navy); color: var(--cream);
+    transition: all 0.18s ease; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: var(--navy-dark); transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--navy); }
+  .btn-ghost:hover { background: var(--beige-soft); transform: none; }
+  .btn-sm { font-size: 12px; padding: 6px 13px; }
+
+  /* ---------- EXPENSE BAR ---------- */
+  .expense-bar { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
+  .expense-total { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--navy-dark); }
+  .expense-break { font-size: 12.5px; color: var(--text-soft); }
+
+  /* ---------- PROGRESS ---------- */
+  .prog-track { height: 9px; background: var(--beige-soft); border-radius: 99px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 99px; }
+  .prog-fill.navy { background: var(--navy); }
+  .prog-fill.amber { background: var(--amber); }
+  .prog-fill.green { background: var(--green); }
+
+  /* ---------- COURSE CARDS ---------- */
+  .course-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .course-card { background: var(--white); border: 1px solid var(--beige); border-radius: var(--radius-sm); padding: 16px 17px; }
+  .course-card.ai { background: var(--ai-blue-bg); border-color: var(--ai-blue-border); }
+  .course-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+  .course-name { font-size: 14px; font-weight: 600; color: var(--navy-dark); line-height: 1.35; }
+  .course-why { font-size: 12px; color: var(--text-soft); line-height: 1.5; margin-bottom: 12px; }
+  .course-foot { display: flex; justify-content: space-between; align-items: center; }
+  .course-time { font-size: 11.5px; color: var(--text-faint); }
+
+  /* ---------- SEARCH ---------- */
+  .search-box {
+    display: flex; align-items: center; gap: 11px;
+    background: var(--white); border: 1px solid var(--beige);
+    border-radius: var(--radius-sm); padding: 13px 17px;
+  }
+  .search-box i { font-size: 18px; color: var(--text-faint); }
+  .search-box input { border: none; outline: none; flex: 1; font-family: inherit; font-size: 14px; background: none; color: var(--navy-dark); }
+  .search-box input::placeholder { color: var(--text-faint); }
+
+  /* ---------- PARTNER ---------- */
+  .need-box { background: var(--white); border: 1px solid var(--beige); border-radius: var(--radius); padding: 20px 22px; margin-bottom: 18px; }
+  .need-label { font-size: 13px; font-weight: 600; color: var(--text-soft); margin-bottom: 11px; }
+  .need-input-row { display: flex; gap: 10px; }
+  .need-input-row input {
+    flex: 1; font-family: inherit; font-size: 14px;
+    padding: 11px 15px; border: 1px solid var(--beige); border-radius: 9px;
+    outline: none; color: var(--navy-dark); background: var(--cream);
+  }
+  .need-input-row input:focus { border-color: var(--navy); }
+
+  .partner-match { background: var(--ai-blue-bg); border: 1.5px solid var(--ai-blue-border); border-radius: var(--radius); padding: 20px 22px; margin-bottom: 16px; }
+  .partner-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .partner-id { display: flex; align-items: center; gap: 12px; }
+  .partner-avatar { width: 42px; height: 42px; border-radius: 11px; background: var(--navy); color: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; }
+  .partner-name { font-size: 15px; font-weight: 600; color: var(--navy-dark); }
+  .partner-role { font-size: 12.5px; color: var(--text-soft); margin-top: 1px; }
+  .partner-why { font-size: 13.5px; color: #45433d; line-height: 1.6; margin-bottom: 16px; }
+  .partner-why strong { color: var(--navy-dark); }
+
+  .temp { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 99px; display: inline-flex; align-items: center; gap: 4px; }
+  .temp.hot { background: var(--red-bg); color: var(--red); }
+  .temp.warm { background: var(--amber-bg); color: var(--amber); }
+  .temp.cold { background: var(--ai-blue-bg); color: var(--navy); }
+
+  .partner-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+  .partner-chip { font-size: 12.5px; color: var(--text-soft); background: var(--white); border: 1px solid var(--beige); padding: 8px 14px; border-radius: 99px; display: flex; align-items: center; gap: 7px; }
+
+  /* ---------- GROWTH ---------- */
+  .health-card { display: flex; align-items: center; gap: 32px; margin-bottom: 20px; }
+  .ring-wrap { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+  .ring-num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring-score { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 700; color: var(--navy-dark); line-height: 1; }
+  .ring-of { font-size: 11px; color: var(--text-faint); margin-top: 2px; }
+  .health-text h3 { font-size: 22px; font-weight: 600; color: var(--navy-dark); margin-bottom: 6px; }
+  .health-text p { font-size: 14px; color: var(--text-soft); line-height: 1.6; max-width: 440px; }
+
+  .metric-card { background: var(--white); border: 1px solid var(--beige); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+  .metric-top { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .metric-top i { font-size: 17px; color: var(--text-soft); }
+  .metric-label { font-size: 13px; font-weight: 600; color: var(--text-soft); }
+  .metric-num { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 600; color: var(--navy-dark); margin-bottom: 12px; line-height: 1; }
+  .metric-foot { font-size: 12px; color: var(--text-faint); margin-top: 10px; }
+
+  .trend-card { margin-top: 18px; }
+
+  /* ---------- STAT TILES ---------- */
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 22px; }
+  .stat-tile {
+    background: var(--white); border: 1px solid var(--beige);
+    border-radius: var(--radius); padding: 18px 20px;
+    box-shadow: var(--shadow); transition: all 0.2s ease; cursor: pointer;
+    position: relative; overflow: hidden;
+  }
+  .stat-tile:hover { box-shadow: var(--shadow-lift); transform: translateY(-2px); border-color: var(--ai-blue-border); }
+  .stat-icon {
+    width: 42px; height: 42px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 21px; margin-bottom: 14px;
+  }
+  .stat-icon.navy { background: var(--ai-blue-bg); color: var(--navy); }
+  .stat-icon.amber { background: var(--amber-bg); color: var(--amber); }
+  .stat-icon.red { background: var(--red-bg); color: var(--red); }
+  .stat-icon.green { background: var(--green-bg); color: var(--green); }
+  .stat-label { font-size: 12.5px; font-weight: 500; color: var(--text-soft); margin-bottom: 5px; }
+  .stat-value { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; color: var(--navy-dark); line-height: 1; }
+  .stat-value small { font-size: 15px; font-weight: 500; color: var(--text-faint); }
+  .stat-link { font-size: 12px; font-weight: 600; color: var(--navy); margin-top: 12px; display: inline-flex; align-items: center; gap: 4px; }
+  .stat-link i { font-size: 13px; transition: transform 0.2s ease; }
+  .stat-tile:hover .stat-link i { transform: translateX(3px); }
+
+  .section-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; letter-spacing: 0.3px; color: var(--text-soft); margin-bottom: 14px; text-transform: uppercase; }
+  .section-label i { font-size: 16px; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 900px) {
+    .grid-3, .grid-2, .course-grid { grid-template-columns: 1fr; }
+    .grid-metrics, .stat-row { grid-template-columns: 1fr 1fr; }
+    .nav-links { gap: 0; }
+    .nav-link span { display: none; }
+    .nav-link { padding: 8px 11px; }
+    .health-card { flex-direction: column; text-align: center; align-items: center; }
+    .wrap { padding: 28px 20px 60px; }
+    .nav-inner { padding: 0 20px; }
+  }
+  @media (max-width: 560px) {
+    .stat-row { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(34, 49, 72, 0.4);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    z-index: 1000; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+  }
+  .modal-overlay.active {
+    opacity: 1; pointer-events: auto;
+  }
+  .modal-box {
+    background: var(--white); border: 1px solid var(--beige);
+    border-radius: var(--radius); padding: 28px; width: 92%; max-width: 520px;
+    box-shadow: var(--shadow-lift); transform: scale(0.95); transition: transform 0.25s ease;
+  }
+  .modal-overlay.active .modal-box {
+    transform: scale(1);
+  }
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+  }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--navy-dark); }
+  .modal-close {
+    background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-faint); transition: color 0.18s ease;
+    line-height: 1;
+  }
+  .modal-close:hover { color: var(--navy-dark); }
+  .form-group { margin-bottom: 16px; text-align: left; }
+  .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text-soft); margin-bottom: 6px; }
+  .form-input {
+    width: 100%; font-family: inherit; font-size: 14px; padding: 10px 14px;
+    border: 1px solid var(--beige); border-radius: 9px; outline: none;
+    color: var(--navy-dark); background: var(--cream);
+  }
+  .form-input:focus { border-color: var(--navy); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+
+  .draft-box {
+    background: var(--white); border: 1px solid var(--beige); border-radius: 9px;
+    padding: 14px; font-family: monospace; font-size: 12.5px; white-space: pre-wrap;
+    max-height: 250px; overflow-y: auto; color: var(--navy-dark); margin-bottom: 16px;
+    text-align: left;
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <span class="brand-name">Adviance</span>
+    </div>
+    <div class="nav-links">
+      <button class="nav-link active" data-screen="dashboard"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v8H4z"/><path d="M4 16h6v4H4z"/><path d="M14 12h6v8h-6z"/><path d="M14 4h6v4h-6z"/></svg></span><span>Dashboard</span></button>
+      <button class="nav-link" data-screen="learning"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 4v16H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M19 16H7a2 2 0 0 0-2 2"/><path d="M9 8h6"/></svg></span><span>Learning</span></button>
+      <button class="nav-link" data-screen="partners"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M5 21v-1a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1"/><path d="M17 11a3 3 0 0 0 0-6"/><path d="M21 21v-1a4 4 0 0 0-3-3.85"/></svg></span><span>Partners</span></button>
+      <button class="nav-link" data-screen="growth"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 12l4-2"/></svg></span><span>Growth</span></button>
+    </div>
+    <div class="nav-right">
+      <span class="icn nav-bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 1 1 4 0 7 7 0 0 1 4 6v3a4 4 0 0 0 2 3H4a4 4 0 0 0 2-3v-3a7 7 0 0 1 4-6"/><path d="M9 17v1a3 3 0 0 0 6 0v-1"/></svg></span>
+      <div class="nav-user">AR</div>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ============ DASHBOARD ============ -->
+  <section class="screen active" id="dashboard">
+    <div class="dash-head">
+      <div>
+        <h1 class="dash-greet">Good morning, Ahmad</h1>
+        <p class="dash-sub">Here's what needs your attention today.</p>
+      </div>
+      <div class="date-pill"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M16 3v4M8 3v4M4 11h16"/></svg></span> Saturday, 20 June 2026</div>
+    </div>
+
+    <!-- Stat tiles -->
+    <div class="stat-row">
+      <div class="stat-tile" onclick="switchTab('dashboard')">
+        <div class="stat-icon navy"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M16 3v4M8 3v4M4 11h16M8 15h2v2H8z"/></svg></span></div>
+        <div class="stat-label">Meetings today</div>
+        <div class="stat-value" id="stat-meetings">0</div>
+        <span class="stat-link">View schedule <span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+      </div>
+      <div class="stat-tile" onclick="switchTab('dashboard')">
+        <div class="stat-icon amber"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><path d="M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2 2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2"/><path d="M9 14l2 2 4-4"/></svg></span></div>
+        <div class="stat-label">Urgent follow-ups</div>
+        <div class="stat-value" id="stat-followups">0</div>
+        <span class="stat-link">View all <span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+      </div>
+      <div class="stat-tile" onclick="switchTab('dashboard')">
+        <div class="stat-icon red"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.24 3.957l-8.422 14.06A1.989 1.989 0 0 0 3.5 21h16.998a1.989 1.989 0 0 0 1.683-2.983L13.76 3.957a1.989 1.989 0 0 0-3.52 0z"/></svg></span></div>
+        <div class="stat-label">Need attention</div>
+        <div class="stat-value" id="stat-attention">0</div>
+        <span class="stat-link">View clients <span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+      </div>
+      <div class="stat-tile" onclick="switchTab('growth')">
+        <div class="stat-icon green"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></span></div>
+        <div class="stat-label">Health score</div>
+        <div class="stat-value" id="stat-health">0<small> /100</small></div>
+        <span class="stat-link">View breakdown <span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></span>
+      </div>
+    </div>
+
+    <div class="ai-card briefing">
+      <div class="briefing-sun"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" fill="none"/><circle cx="12" cy="12" r="4"/><path d="M12 3v1M12 20v1M5.6 5.6l.7.7M17.7 17.7l.7.7M3 12h1M20 12h1M5.6 18.4l.7-.7M17.7 6.3l.7-.7"/></svg></span></div>
+      <div class="briefing-body">
+        <div class="briefing-top">
+          <span class="briefing-greet">Your morning briefing</span>
+          <span class="ai-badge"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/></svg></span> AI Generated</span>
+        </div>
+        <p class="briefing-text" id="briefing-content">Synthesizing agenda, tasks, and client notes into morning briefing...</p>
+      </div>
+    </div>
+
+    <div class="section-label"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg></span> Today at a glance</div>
+
+    <div class="grid-3">
+      <!-- Needs attention -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="icn" style="color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c2-2.96 0-7-1-8 0 3.038-1.773 4.741-3 6-1.226 1.26-2 3.24-2 5a6 6 0 1 0 12 0c0-1.532-1.056-3.94-2-5-1.786 3-2.791 3-4 2z"/></svg></span> Needs attention</div>
+          <button class="btn btn-ghost btn-sm" onclick="openModal('client-modal')"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span> Add client</button>
+        </div>
+        <div id="attention-client-list">
+          <div style="font-size: 13px; color: var(--text-faint); padding: 15px 0;">Evaluating client urgency metrics...</div>
+        </div>
+      </div>
+
+      <!-- Schedule -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="icn" style="color:var(--navy)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M16 3v4M8 3v4M4 11h16M8 15h2v2H8z"/></svg></span> Today's schedule</div>
+        </div>
+        <div id="schedule-list">
+          <div style="font-size: 13px; color: var(--text-faint); padding: 15px 0;">Loading today's agenda...</div>
+        </div>
+      </div>
+
+      <!-- Follow-ups -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><span class="icn" style="color:var(--navy)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 5-5"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg></span> Follow-ups</div>
+        </div>
+        <div id="followups-list">
+          <div style="font-size: 13px; color: var(--text-faint); padding: 15px 0;">Loading follow-up tasks...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expenses -->
+    <div class="card" style="margin-top:18px;">
+      <div class="expense-bar">
+        <div class="card-title"><span class="icn" style="color:var(--navy)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6"/><path d="M17 12h.01"/></svg></span> Expenses this month</div>
+        <div style="text-align:right;">
+          <span class="expense-total" id="expense-total-val">RM 0</span>
+          <div class="expense-break" id="expense-breakdown-val">Loading expenses...</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LEARNING ============ -->
+  <section class="screen" id="learning">
+    <div class="page-head">
+      <div class="eyebrow">Continuous development</div>
+      <h1 class="page-title">Learning hub</h1>
+      <p class="page-sub">Your learning, shaped by who your clients actually are.</p>
+    </div>
+
+    <!-- CPD progress -->
+    <div class="card" style="margin-bottom:18px;">
+      <div class="card-head" style="margin-bottom:14px;">
+        <div class="card-title"><span class="icn" style="color:var(--navy)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M9 8l-2 9 5-3 5 3-2-9"/></svg></span> CPD progress</div>
+        <span id="cpd-text" style="font-size:13px; color:var(--text-soft); font-weight:500;">0 of 35 hours this year</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill navy" id="cpd-fill" style="width:0%;"></div></div>
+      <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:12px; color:var(--text-faint);">
+        <span id="cpd-breakdown">0 structured · 0 unstructured</span>
+        <span id="cpd-remaining">35 hours remaining</span>
+      </div>
+    </div>
+
+    <!-- AI recommendations -->
+    <div class="ai-card" style="margin-bottom:18px;">
+      <div class="card-head">
+        <div class="card-title"><span class="icn" style="color:var(--ai-blue)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/></svg></span> Recommended for your clients</div>
+        <span class="ai-badge"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/></svg></span> AI Generated</span>
+      </div>
+      <div class="course-grid" id="course-recommendations-list">
+        <div style="font-size:13px; color:var(--text-faint); padding:10px 0;">Evaluating client skill gaps...</div>
+      </div>
+    </div>
+
+    <!-- Ask AI -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px;"><span class="icn" style="color:var(--navy)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20l1.3-3.9A8 8 0 1 1 12 21a8 8 0 0 1-3.9-1z"/><path d="M12 16v.01M12 13a2 2 0 1 0-2-2"/></svg></span> Ask Adviance</div>
+      <div class="search-box">
+        <span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><path d="M21 21l-6-6"/></svg></span>
+        <input id="ask-input" placeholder="Ask anything — e.g. How does Takaful differ from conventional insurance?">
+        <button id="ask-btn" class="btn btn-sm" onclick="askAdviance()">Ask</button>
+      </div>
+      <div id="ask-response-box" class="ai-card" style="display:none; margin-top:15px; font-size:14.5px; line-height:1.6; border-left: 4px solid var(--navy); text-align: left;"></div>
+      <p style="font-size:12px; color:var(--text-faint); margin-top:11px;">Get a concise, Malaysia-specific brief on any topic before your next client meeting.</p>
+    </div>
+  </section>
+
+  <!-- ============ PARTNERS ============ -->
+  <section class="screen" id="partners">
+    <div class="page-head">
+      <div class="eyebrow">Ecosystem</div>
+      <h1 class="page-title">Partner finder</h1>
+      <p class="page-sub">Describe what your client needs. Adviance finds the right specialist.</p>
+    </div>
+
+    <div class="need-box">
+      <div class="need-label">What does your client need?</div>
+      <div class="need-input-row">
+        <input id="partner-need-input" value="Ahmad needs a lawyer for his business succession plan">
+        <button id="partner-find-btn" class="btn" onclick="findPartnerMatch()"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/></svg></span> Find match</button>
+      </div>
+    </div>
+
+    <div id="partner-matches-container">
+      <div style="font-size:13px; color:var(--text-faint); padding:10px 0; background:var(--white); border:1px solid var(--beige); border-radius:var(--radius); padding:20px; margin-bottom:16px;">Type a need above to find the best specialist partners.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px;"><span class="icn" style="color:var(--navy)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M12 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M9 16a3 3 0 0 1 6 0M3 8h2M3 12h2M3 16h2"/></svg></span> Your partner network</div>
+      <div class="partner-chips" id="partner-network-chips">
+        <div style="font-size:12px; color:var(--text-faint);">Loading partners...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GROWTH ============ -->
+  <section class="screen" id="growth">
+    <div class="page-head">
+      <div class="eyebrow">Performance</div>
+      <h1 class="page-title">Growth</h1>
+      <p class="page-sub">One score across client care, learning, and your ecosystem.</p>
+    </div>
+
+    <div class="card health-card">
+      <div class="ring-wrap">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#e6ddd1" stroke-width="10"/>
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#2f486d" stroke-width="10" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="69" id="growth-ring-fill" transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="ring-num"><div class="ring-score" id="growth-health-score">0</div><div class="ring-of">of 100</div></div>
+      </div>
+      <div class="health-text">
+        <h3>Advisor health score</h3>
+        <p id="growth-summary-text">Calculating advisor performance score...</p>
+      </div>
+    </div>
+
+    <div class="grid-metrics">
+      <div class="metric-card">
+        <div class="metric-top"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M3 21v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1"/><path d="M16 5.5a3 3 0 0 1 0 5.5M21 21v-1a5 5 0 0 0-3-4.5"/></svg></span><span class="metric-label">Client engagement</span></div>
+        <div class="metric-num" id="growth-engagement-val">0</div>
+        <div class="prog-track"><div class="prog-fill green" id="growth-engagement-fill" style="width:0%;"></div></div>
+        <div class="metric-foot" id="growth-engagement-foot">0 of 0 clients contacted in 30 days</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-top"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 4v16H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M19 16H7a2 2 0 0 0-2 2"/><path d="M9 8h6"/></svg></span><span class="metric-label">Learning progress</span></div>
+        <div class="metric-num" id="growth-learning-val">0</div>
+        <div class="prog-track"><div class="prog-fill amber" id="growth-learning-fill" style="width:0%;"></div></div>
+        <div class="metric-foot">0 of 35 CPD hours completed</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-top"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11l-2-2a1.5 1.5 0 0 0-2 0l-3 3a1.5 1.5 0 0 0 2 2"/><path d="M12 11l3 3 2 2a1.5 1.5 0 0 0 2-2l-3-3"/><path d="M3 10l3-3h4l2 2M21 10l-3-3h-3"/></svg></span><span class="metric-label">Partner activity</span></div>
+        <div class="metric-num" id="growth-partner-val">0</div>
+        <div class="prog-track"><div class="prog-fill green" id="growth-partner-fill" style="width:0%;"></div></div>
+        <div class="metric-foot">0 of 0 partners active this quarter</div>
+      </div>
+    </div>
+
+    <div class="card trend-card">
+      <div class="card-title" style="margin-bottom:18px;"><span class="icn" style="color:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></span> Health score — last 4 weeks</div>
+      <svg width="100%" height="120" viewBox="0 0 680 120" preserveAspectRatio="none" style="overflow:visible;">
+        <line x1="0" y1="100" x2="680" y2="100" stroke="#e6ddd1" stroke-width="1"/>
+        <polyline points="40,82 240,70 440,52 640,34" fill="none" stroke="#2f486d" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="40" cy="82" r="4" fill="#2f486d"/>
+        <circle cx="240" cy="70" r="4" fill="#2f486d"/>
+        <circle cx="440" cy="52" r="4" fill="#2f486d"/>
+        <circle cx="640" cy="34" r="5" fill="#2f486d"/>
+      </svg>
+      <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:12px; color:var(--text-faint);">
+        <span>Week 1 · 71</span><span>Week 2 · 73</span><span>Week 3 · 76</span><span style="color:var(--green); font-weight:600;">Week 4 · 78</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Client Modal -->
+<div class="modal-overlay" id="client-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 class="modal-title">Add New Client</h3>
+      <button class="modal-close" onclick="closeModal('client-modal')">&times;</button>
+    </div>
+    <form id="add-client-form" onsubmit="submitClientForm(event)">
+      <div class="form-group">
+        <label class="form-label">Client Name</label>
+        <input type="text" id="client-name" class="form-input" placeholder="e.g. David Lim" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Portfolio Value (RM)</label>
+          <input type="number" id="client-portfolio" class="form-input" placeholder="e.g. 820000" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Performance Change (%)</label>
+          <input type="number" step="0.1" id="client-perf" class="form-input" placeholder="e.g. -2.0" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Contact Date</label>
+        <input type="date" id="client-contact" class="form-input" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Life Events / Segment</label>
+        <input type="text" id="client-events" class="form-input" placeholder="e.g. Retired, concerned about market stability" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Unstructured Meeting Notes (Claude evaluates emotional signals)</label>
+        <textarea id="client-notes" class="form-input" rows="3" placeholder="e.g. seeming anxious about market volatility and asking whether to pull out everything" required></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('client-modal')">Cancel</button>
+        <button type="submit" class="btn">Save Client</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Draft/Introduction Modal -->
+<div class="modal-overlay" id="intro-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 class="modal-title">Draft Introduction Email</h3>
+      <button class="modal-close" onclick="closeModal('intro-modal')">&times;</button>
+    </div>
+    <div class="draft-box" id="intro-email-content">Loading template...</div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-ghost" onclick="closeModal('intro-modal')">Close</button>
+      <button type="button" class="btn" id="copy-email-btn" onclick="copyEmailToClipboard()">Copy to Clipboard</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pre-meeting Brief Modal -->
+<div class="modal-overlay" id="brief-modal">
+  <div class="modal-box" style="max-width: 580px;">
+    <div class="modal-head">
+      <h3 class="modal-title" id="brief-modal-title">Pre-meeting Briefing</h3>
+      <button class="modal-close" onclick="closeModal('brief-modal')">&times;</button>
+    </div>
+    <div style="font-size: 14px; margin-bottom: 20px; text-align: left;">
+      <h4 style="font-size: 15px; font-weight:600; margin-bottom:6px; color:var(--navy);">Situation Summary</h4>
+      <p id="brief-situation" style="color: #45433d; line-height:1.6; margin-bottom: 16px;"></p>
+      
+      <h4 style="font-size: 15px; font-weight:600; margin-bottom:6px; color:var(--navy);">Suggested Talking Points</h4>
+      <ul id="brief-talking-points" style="list-style-type: decimal; padding-left: 20px; color: #45433d; line-height: 1.6;">
+        <!-- Filled dynamically -->
+      </ul>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn" onclick="closeModal('brief-modal')">Got it</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const links = document.querySelectorAll('.nav-link');
+  const screens = document.querySelectorAll('.screen');
+  
+  // Navigation
+  links.forEach(link => {
+    link.addEventListener('click', () => {
+      const target = link.dataset.screen;
+      switchTab(target);
+    });
+  });
+
+  function switchTab(tabId) {
+    links.forEach(l => {
+      l.classList.toggle('active', l.dataset.screen === tabId);
+    });
+    screens.forEach(s => {
+      s.classList.toggle('active', s.id === tabId);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Refresh tab-specific data when clicked
+    if (tabId === 'dashboard') {
+      loadDashboard();
+    } else if (tabId === 'learning') {
+      loadLearning();
+    } else if (tabId === 'partners') {
+      loadPartners();
+    } else if (tabId === 'growth') {
+      loadGrowth();
+    }
+  }
+
+  // Modals management
+  function openModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+  }
+
+  function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+  }
+
+  // Initial Load
+  window.addEventListener('DOMContentLoaded', () => {
+    // Set default date input value to today (2026-06-20)
+    document.getElementById('client-contact').value = '2026-06-20';
+    loadDashboard();
+  });
+
+  // 1. Dashboard Tab Loading
+  async function loadDashboard() {
+    try {
+      // Load Stats
+      const statsRes = await fetch('/api/dashboard/stats');
+      const stats = await statsRes.json();
+      document.getElementById('stat-meetings').innerText = stats.meetings_count;
+      document.getElementById('stat-followups').innerText = stats.followups_count;
+      document.getElementById('stat-attention').innerText = stats.attention_count;
+      document.getElementById('stat-health').innerHTML = `${stats.health_score}<small> /100</small>`;
+
+      // Load Briefing
+      const briefingRes = await fetch('/api/dashboard/briefing');
+      const briefing = await briefingRes.json();
+      document.getElementById('briefing-content').innerHTML = briefing.briefing;
+
+      // Load agenda (meetings + followups)
+      const agendaRes = await fetch('/api/dashboard/agenda');
+      const agenda = await agendaRes.json();
+      renderSchedule(agenda.schedule);
+      renderFollowups(agenda.followUps);
+
+      // Load client priorities
+      const prioritiesRes = await fetch('/api/dashboard/priorities');
+      const priorities = await prioritiesRes.json();
+      renderPriorities(priorities);
+
+      // Load Expenses
+      const growthRes = await fetch('/api/growth/stats');
+      const growth = await growthRes.json();
+      // Hardcoded RM 1,240 match from seed data or custom logic
+      document.getElementById('expense-total-val').innerText = 'RM 1,240';
+      document.getElementById('expense-breakdown-val').innerText = 'Client meals RM 480 · Travel RM 320 · Other RM 440';
+    } catch (err) {
+      console.error('Error loading dashboard:', err);
+    }
+  }
+
+  function renderSchedule(schedule) {
+    const container = document.getElementById('schedule-list');
+    if (!schedule || schedule.length === 0) {
+      container.innerHTML = `<div style="font-size:13px; color:var(--text-faint); padding: 15px 0;">No meetings scheduled today.</div>`;
+      return;
+    }
+
+    container.innerHTML = schedule.map(item => `
+      <div class="list-item" style="cursor: pointer;" onclick="showPreMeetingBrief(${item.client_id}, '${escapeHtml(item.client_name)}')">
+        <div class="list-time">${item.time}</div>
+        <div class="list-main">${item.client_name} — ${item.title}</div>
+        ${item.suggested ? '<div class="list-flag flag-red">Suggested by Adviance (Click to view brief)</div>' : '<div class="list-flag flag-faint">Click to view pre-meeting brief</div>'}
+      </div>
+    `).join('');
+  }
+
+  function renderFollowups(followUps) {
+    const container = document.getElementById('followups-list');
+    const pending = followUps.filter(f => f.status === 'pending');
+    if (pending.length === 0) {
+      container.innerHTML = `<div style="font-size:13px; color:var(--text-faint); padding: 15px 0;">All follow-ups completed!</div>`;
+      return;
+    }
+
+    // Reference date: 2026-06-20
+    const refDate = new Date('2026-06-20');
+
+    container.innerHTML = pending.map(item => {
+      const dueDate = new Date(item.due_date);
+      const diffTime = refDate - dueDate;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      let dueText = '';
+      let isOverdue = false;
+      if (diffTime > 0) {
+        dueText = `Overdue ${diffDays} day${diffDays === 1 ? '' : 's'}`;
+        isOverdue = true;
+      } else if (diffTime === 0) {
+        dueText = 'Due today';
+      } else {
+        dueText = `Due in ${Math.abs(diffDays)} day${Math.abs(diffDays) === 1 ? '' : 's'}`;
+      }
+
+      return `
+        <div class="list-item" style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
+          <div style="flex: 1; padding-right: 10px;">
+            <div class="list-main">${item.description}</div>
+            <div class="list-flag ${isOverdue ? 'flag-red' : 'flag-faint'}">${dueText} (${item.client_name || 'General'})</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="padding: 4px 8px; font-size:11px;" onclick="completeFollowUp(${item.id})">Complete</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function completeFollowUp(id) {
+    try {
+      const res = await fetch(`/api/follow-ups/${id}/complete`, { method: 'POST' });
+      if (res.ok) {
+        loadDashboard();
+      }
+    } catch (err) {
+      console.error('Error completing follow-up:', err);
+    }
+  }
+
+  function renderPriorities(priorities) {
+    const container = document.getElementById('attention-client-list');
+    if (!priorities || priorities.length === 0) {
+      container.innerHTML = `<div style="font-size:13px; color:var(--text-faint); padding: 15px 0;">No client priorities defined.</div>`;
+      return;
+    }
+
+    container.innerHTML = priorities.map(c => {
+      const badgeClass = c.urgency === 'high' ? 'high' : (c.urgency === 'med' ? 'med' : 'low');
+      const dotClass = badgeClass;
+      return `
+        <div class="client-row" style="cursor: pointer;" onclick="showPreMeetingBrief(${c.id}, '${escapeHtml(c.name)}')">
+          <div class="dot ${dotClass}"></div>
+          <div class="client-info">
+            <div class="client-name">${c.name}</div>
+            <div class="client-meta">${c.reason}</div>
+          </div>
+          <div class="client-score"><div class="score-num">${c.score || 0}</div><div class="score-label">score</div></div>
+          <span class="badge ${badgeClass}">${c.urgency.toUpperCase()}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Pre-meeting brief modal
+  async function showPreMeetingBrief(clientId, clientName) {
+    try {
+      const briefTitle = document.getElementById('brief-modal-title');
+      const briefSituation = document.getElementById('brief-situation');
+      const briefTalkingPoints = document.getElementById('brief-talking-points');
+      
+      briefTitle.innerText = `Pre-meeting Briefing: ${clientName}`;
+      briefSituation.innerText = 'Analyzing client records and generating contextual intelligence...';
+      briefTalkingPoints.innerHTML = '<li style="list-style:none;">Loading suggested talking points...</li>';
+      
+      openModal('brief-modal');
+
+      const res = await fetch(`/api/learning/pre-meeting-brief?clientId=${clientId}`);
+      if (res.ok) {
+        const brief = await res.json();
+        briefSituation.innerText = brief.situation_summary;
+        briefTalkingPoints.innerHTML = brief.talking_points.map(pt => `<li>${pt}</li>`).join('');
+      } else {
+        briefSituation.innerText = 'Failed to load briefing details.';
+        briefTalkingPoints.innerHTML = '';
+      }
+    } catch (err) {
+      console.error('Error fetching brief:', err);
+    }
+  }
+
+  // Add client form submission
+  async function submitClientForm(event) {
+    event.preventDefault();
+    const clientData = {
+      name: document.getElementById('client-name').value,
+      portfolio_value: parseFloat(document.getElementById('client-portfolio').value),
+      portfolio_performance_change: parseFloat(document.getElementById('client-perf').value) / 100,
+      last_contact_date: document.getElementById('client-contact').value,
+      life_events: document.getElementById('client-events').value,
+      meeting_notes: document.getElementById('client-notes').value
+    };
+
+    try {
+      const res = await fetch('/api/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(clientData)
+      });
+      if (res.ok) {
+        closeModal('client-modal');
+        document.getElementById('add-client-form').reset();
+        document.getElementById('client-contact').value = '2026-06-20';
+        loadDashboard();
+      }
+    } catch (err) {
+      console.error('Error adding client:', err);
+    }
+  }
+
+  // 2. Learning Tab Loading
+  async function loadLearning() {
+    try {
+      const res = await fetch('/api/learning/recommendations');
+      const data = await res.json();
+      
+      // Update CPD progress
+      const completed = data.completed_hours;
+      const target = data.target_hours;
+      const pct = Math.min((completed / target) * 100, 100);
+      document.getElementById('cpd-text').innerText = `${completed} of ${target} hours this year`;
+      document.getElementById('cpd-fill').style.width = `${pct}%`;
+      
+      const structured = data.allModules.filter(m => m.completed && m.category === 'structured').reduce((sum, m) => sum + m.hours, 0);
+      const unstructured = data.allModules.filter(m => m.completed && m.category === 'unstructured').reduce((sum, m) => sum + m.hours, 0);
+      document.getElementById('cpd-breakdown').innerText = `${structured} structured · ${unstructured} unstructured`;
+      
+      const remaining = Math.max(target - completed, 0);
+      document.getElementById('cpd-remaining').innerText = `${remaining} hour${remaining === 1 ? '' : 's'} remaining`;
+
+      // Render recommendations
+      renderCourseRecommendations(data.allModules, data.recommendations);
+    } catch (err) {
+      console.error('Error loading learning data:', err);
+    }
+  }
+
+  function renderCourseRecommendations(allModules, recommendations) {
+    const container = document.getElementById('course-recommendations-list');
+    
+    // Filter out completed modules
+    const uncompleted = allModules.filter(m => !m.completed);
+    if (uncompleted.length === 0) {
+      container.innerHTML = `<div style="font-size:13px; color:var(--text-faint); padding:10px 0; grid-column: 1/-1;">All available compliance and CPD modules completed!</div>`;
+      return;
+    }
+
+    // Map modules with Claude justifications
+    container.innerHTML = uncompleted.map(m => {
+      const rec = recommendations.find(r => r.cpd_id === m.id);
+      const badge = rec ? rec.urgency.toUpperCase() : 'MED';
+      const badgeClass = badge === 'HIGH' ? 'high' : 'med';
+      const justification = rec ? rec.justification : m.description;
+
+      return `
+        <div class="course-card ${rec ? 'ai' : ''}">
+          <div class="course-top">
+            <div class="course-name">${m.title}</div>
+            <span class="badge ${badgeClass}">${badge}</span>
+          </div>
+          <p class="course-why">${justification}</p>
+          <div class="course-foot">
+            <span class="course-time">${m.duration || '30 min'} · ${m.hours} CPD hours</span>
+            <button class="btn btn-sm" onclick="completeCPDModule(${m.id})">Complete</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function completeCPDModule(id) {
+    try {
+      const res = await fetch('/api/learning/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ moduleId: id })
+      });
+      if (res.ok) {
+        loadLearning();
+      }
+    } catch (err) {
+      console.error('Error completing course:', err);
+    }
+  }
+
+  // Ask Adviance Query
+  async function askAdviance() {
+    const query = document.getElementById('ask-input').value;
+    const askBtn = document.getElementById('ask-btn');
+    const responseBox = document.getElementById('ask-response-box');
+
+    if (!query.trim()) return;
+
+    askBtn.disabled = true;
+    askBtn.innerText = 'Searching...';
+    responseBox.style.display = 'block';
+    responseBox.innerText = 'Adviance is evaluating regulations and client data...';
+
+    try {
+      const res = await fetch('/api/learning/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        responseBox.innerHTML = `<strong>Adviance Response:</strong><p style="margin-top:5px;">${data.answer}</p>`;
+      } else {
+        responseBox.innerText = 'Error calling Adviance reasoning API.';
+      }
+    } catch (err) {
+      console.error('Error asking Adviance:', err);
+      responseBox.innerText = 'Network error contacting server.';
+    } finally {
+      askBtn.disabled = false;
+      askBtn.innerText = 'Ask';
+    }
+  }
+
+  // 3. Partners Tab Loading
+  async function loadPartners() {
+    try {
+      const res = await fetch('/api/partners');
+      const partners = await res.json();
+      renderPartnersChips(partners);
+    } catch (err) {
+      console.error('Error loading partners network:', err);
+    }
+  }
+
+  function renderPartnersChips(partners) {
+    const container = document.getElementById('partner-network-chips');
+    container.innerHTML = partners.map(p => {
+      const tempClass = p.health === 'hot' ? 'hot' : (p.health === 'warm' ? 'warm' : 'cold');
+      return `
+        <span class="partner-chip"><strong style="color:var(--navy-dark)">${p.name}</strong> · ${p.specialty.split(' ')[0]} <span class="temp ${tempClass}" style="padding:2px 8px;">${p.health.toUpperCase()}</span></span>
+      `;
+    }).join('');
+  }
+
+  // Find partner match
+  async function findPartnerMatch() {
+    const input = document.getElementById('partner-need-input').value;
+    const btn = document.getElementById('partner-find-btn');
+    const container = document.getElementById('partner-matches-container');
+
+    if (!input.trim()) return;
+
+    btn.disabled = true;
+    btn.innerHTML = 'Finding match...';
+    container.innerHTML = '<div style="font-size:13px; color:var(--text-faint); padding:10px 0; background:var(--white); border:1px solid var(--beige); border-radius:var(--radius); padding:20px; margin-bottom:16px;">Adviance AI is scanning network capabilities...</div>';
+
+    try {
+      const res = await fetch('/api/partners/match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientNeed: input })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        renderMatches(data.matches);
+      } else {
+        container.innerHTML = 'Error fetching matches.';
+      }
+    } catch (err) {
+      console.error('Error matching partners:', err);
+      container.innerHTML = 'Network error.';
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/></svg></span> Find match`;
+    }
+  }
+
+  let activeDraftEmail = '';
+
+  function renderMatches(matches) {
+    const container = document.getElementById('partner-matches-container');
+    if (!matches || matches.length === 0) {
+      container.innerHTML = `<div style="font-size:13px; color:var(--text-faint); padding:20px; background:var(--white); border:1px solid var(--beige); border-radius:var(--radius); margin-bottom:16px;">No matches found matching that description.</div>`;
+      return;
+    }
+
+    container.innerHTML = matches.map((m, index) => {
+      const tempClass = m.compatibility === 'hot' ? 'hot' : (m.compatibility === 'warm' ? 'warm' : 'cold');
+      const avatarLetters = m.name.split(' ').slice(1).map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'SP';
+      
+      return `
+        <div class="partner-match" style="text-align: left;">
+          <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+            <span class="ai-badge"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/></svg></span> AI Generated</span>
+          </div>
+          <div class="partner-head">
+            <div class="partner-id">
+              <div class="partner-avatar">${avatarLetters}</div>
+              <div>
+                <div class="partner-name">${m.name}</div>
+                <div class="partner-role">${m.specialty}</div>
+              </div>
+            </div>
+            <span class="temp ${tempClass}"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c2-2.96 0-7-1-8 0 3.038-1.773 4.741-3 6-1.226 1.26-2 3.24-2 5a6 6 0 1 0 12 0c0-1.532-1.056-3.94-2-5-1.786 3-2.791 3-4 2z"/></svg></span> ${m.compatibility.toUpperCase()}</span>
+          </div>
+          <p class="partner-why"><strong>Match Reasoning.</strong> ${m.reason}</p>
+          <button class="btn" onclick="openIntroModal(${index})"><span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l9 6 9-6"/></svg></span> Draft introduction</button>
+        </div>
+      `;
+    }).join('');
+
+    // Save templates globally to retrieve in modal
+    window.matchedPartnersData = matches;
+  }
+
+  function openIntroModal(index) {
+    const match = window.matchedPartnersData[index];
+    activeDraftEmail = match.draft_email;
+    document.getElementById('intro-email-content').innerText = activeDraftEmail;
+    openModal('intro-modal');
+  }
+
+  function copyEmailToClipboard() {
+    const content = activeDraftEmail || document.getElementById('intro-email-content').innerText;
+    navigator.clipboard.writeText(content).then(() => {
+      const copyBtn = document.getElementById('copy-email-btn');
+      copyBtn.innerText = 'Copied!';
+      setTimeout(() => {
+        copyBtn.innerText = 'Copy to Clipboard';
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy text: ', err);
+    });
+  }
+
+  // 4. Growth Tab Loading
+  async function loadGrowth() {
+    try {
+      const res = await fetch('/api/growth/stats');
+      const health = await res.json();
+
+      // Ring health score
+      document.getElementById('growth-health-score').innerText = health.health_score;
+      const fillSvg = document.getElementById('growth-ring-fill');
+      // Dasharray is 314, offset formula: 314 * (1 - score/100)
+      const offset = Math.round(314 * (1 - health.health_score / 100));
+      fillSvg.setAttribute('stroke-dashoffset', offset);
+
+      // Summary text
+      let summary = `You're performing strongly across client engagement and partner activity. `;
+      if (health.learning_progress < 50) {
+        summary += `Learning progress is the main area with room to grow — completing your recommended CPD modules will lift this score significantly.`;
+      } else {
+        summary += `All areas are in excellent health! Keep maintaining regular client check-ins and updating compliance credentials.`;
+      }
+      document.getElementById('growth-summary-text').innerText = summary;
+
+      // Metric 1: Client Engagement
+      document.getElementById('growth-engagement-val').innerText = health.client_engagement;
+      document.getElementById('growth-engagement-fill').style.width = `${health.client_engagement}%`;
+      document.getElementById('growth-engagement-foot').innerText = `${health.engaged_count} of ${health.total_clients} clients contacted in 30 days`;
+
+      // Metric 2: Learning progress
+      document.getElementById('growth-learning-val').innerText = health.learning_progress;
+      document.getElementById('growth-learning-fill').style.width = `${health.learning_progress}%`;
+      document.getElementById('growth-learning-foot').innerText = `${health.completed_hours} of ${health.target_hours} CPD hours completed`;
+
+      // Metric 3: Partner activity
+      document.getElementById('growth-partner-val').innerText = health.partner_activity;
+      document.getElementById('growth-partner-fill').style.width = `${health.partner_activity}%`;
+      document.getElementById('growth-partner-foot').innerText = `${health.active_partners} of ${health.total_partners} partners active this quarter`;
+
+    } catch (err) {
+      console.error('Error loading growth details:', err);
+    }
+  }
+
+  // Utility helpers
+  function escapeHtml(text) {
+    if (!text) return '';
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+</script>
+
+</body>
+</html>
